@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-lm -Isrc
+CFLAGS= -O3 -lm -Isrc -fopenmp
 TEST_FLAGS=-lm -lcunit -Isrc $(shell pkg-config --cflags --libs cunit)
 
 all: cg
@@ -18,6 +18,12 @@ test_cg: test/test_cg.o src/cg.o src/misc.o
 
 test/test_cg.o: test/test_cg.c src/cg.h src/misc.h
 	$(CC) -c $< -o $@ $(TEST_FLAGS)
+
+run: cg
+	./cg -r benchmark/1_cg_random.in
+
+runlong: cg	
+	./cg -r benchmark/cg_large_random.in
 
 # Cleaning up
 clean:

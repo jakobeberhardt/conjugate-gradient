@@ -7,6 +7,10 @@ make
 ```
 make test
 ```
+For OpenMP
+```
+make && OMP_NUM_THREADS=4 ./cg -r benchmark/cg_large_random.in
+```
 ## Implementation
 **Input**: 
 - $A$ : Sparse matrix of the system

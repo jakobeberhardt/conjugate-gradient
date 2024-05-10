@@ -3,34 +3,43 @@
 #include "misc.h"
 #include <string.h>
 #include <math.h>
+#include <time.h>
+
+#define SEED 1234
+#define MAX_PRINT 4
+
+double wtime() {
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+    return (double)ts.tv_sec + ts.tv_nsec / 1E9;
+}
 
 void print_result(double *x, double *r, double *p, double *Ap, double residual, int iter, int N) {
-    printf("Solution vector x*:\n");
-    for (int i = 0; i < N; i++) {
+    printf("Head of solution vector x*:\n");
+    for (int i = 0; i < MAX_PRINT; i++) {
         printf("%f ", x[i]);
     }
+    printf(" ...");
     printf("\n");
 
-    printf("Residual vector r:\n");
-    for (int i = 0; i < N; i++) {
-        printf("%f ", r[i]);
-    }
-    printf("\n");
+    // printf("Residual vector r:\n");
+    // for (int i = 0; i < MAX_PRINT; i++) {
+    //     printf("%f ", r[i]);
+    // }
+    // printf("\n");
 
-    printf("Search direction vector p:\n");
-    for (int i = 0; i < N; i++) {
-        printf("%f ", p[i]);
-    }
-    printf("\n");
+    // printf("Search direction vector p:\n");
+    // for (int i = 0; i < MAX_PRINT; i++) {
+    //     printf("%f ", p[i]);
+    // }
+    // printf("\n");
 
-    printf("Vector Ap:\n");
-    for (int i = 0; i < N; i++) {
-        printf("%f ", Ap[i]);
-    }
-    printf("\n");
+    // printf("Vector Ap:\n");
+    // for (int i = 0; i < MAX_PRINT; i++) {
+    //     printf("%f ", Ap[i]);
+    // }
+    // printf("\n");
 
-    printf("Final residual: %f\n", residual);
-    printf("Total iterations: %d\n", iter);
 }
 
 CGParams init_cg(const char* filename) {
@@ -115,7 +124,7 @@ CGParams random_init_cg(const char* filename) {
     }
 
     fclose(file);
-
+    srand(SEED);
     params.A = (double*) malloc(params.N * params.N * sizeof(double));
     if (params.A == NULL) {
         fprintf(stderr, "Memory allocation failed for A\n");

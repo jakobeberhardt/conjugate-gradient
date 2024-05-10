@@ -14,5 +14,6 @@ CGParams init_cg(const char* filename);
 void print_cg_params(const CGParams params);
 CGParams random_init_cg(const char* filename);
 void generateRandomSPDMatrix(double *A, int N);
+double wtime();
 
 #endif /* MISC_H */

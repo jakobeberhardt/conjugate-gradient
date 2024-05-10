@@ -5,6 +5,7 @@ int conjugate_gradient(const double *A, double *Ap, const double *b, double *x, 
 	double sum, alpha, beta, rsnew, p_Ap, local_residual;
 
 	// init R
+	#pragma omp parallel for private(sum)
 	for(int i=0; i<nrow; i++) {
 		sum=0;
 		for(int j=0; j<nrow; j++) {
@@ -26,6 +27,7 @@ int conjugate_gradient(const double *A, double *Ap, const double *b, double *x, 
 	}
 
 	// Compute Ap
+	#pragma omp parallel for private(sum)
 	for(int i=0; i<nrow; i++) {
 		sum = 0;
 		for(int j=0; j<nrow; j++) {

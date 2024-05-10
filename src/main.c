@@ -38,24 +38,23 @@ int main(int argc, char **argv) {
 	double rsold = 0;
 	int conv = 0;
 	
-	clock_t start, end;  
-    double cpu_time_used;
-	start = clock();
+	double start_time, end_time;
 
+	start_time = wtime();
 	do {
 	 	conv = conjugate_gradient(params.A, Ap, params.b, x, r, p, &rsold, &params.tol, &residual, params.N, 0, iter);
 		printf("Residual in iteration %d: %.17f\n", iter, residual);
 		iter++;
 
 	} while (iter <= params.max_iter && !conv);
-	
-	end = clock();
 
-    cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;  
-    printf("Elapsed time   : %f seconds\n", cpu_time_used);
+	end_time = wtime();
+
+	printf("\n");
+	print_result(x, r, p, Ap, residual,iter, params.N);
+	printf("\n");
+    printf("Elapsed time   : %f seconds\n", end_time - start_time);
 	printf("Iteration      : %d\n", iter);
-
-	//print_result(x, r, p, Ap, residual,iter, params.N);
 
 	free(x);
     free(r);
