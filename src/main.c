@@ -1,36 +1,61 @@
 #include <stdlib.h>
 #include "cg.h"
 #include "misc.h"
-
-#define N 4
+#include <stdio.h>
+#include <time.h>
+#include <string.h>
 
 int main(int argc, char **argv) {
-double A[N][N] = {
-        {4.0, 1.0, 1.0, 0.0},
-        {1.0, 3.0, 1.0, 0.0},
-        {1.0, 1.0, 2.0, 0.0},
-        {0.0, 0.0, 0.0, 1.0}
-    };
-	double b[] = {1.0, 2.0, 3.0, 4.0};
-	double *x = calloc(N, sizeof(double));
-	double *r = calloc(N, sizeof(double));
-	double *p = calloc(N, sizeof(double));
-	double *Ap = calloc(N, sizeof(double));
+	if (argc < 2) {
+        fprintf(stderr, "Usage: %s [-r] <config file>\n", argv[0]);
+        return 1;
+    }
 
-	double tol = 1e-6;
-	int max_iter = 1000;
+    CGParams params;
+    int randomInit = 0;
+    char *filename;
+
+    if (argc == 3 && strcmp(argv[1], "-r") == 0) {
+        randomInit = 1;
+        filename = argv[2];
+    } else {
+        filename = argv[1];
+    }
+
+    if (randomInit) {
+        params = random_init_cg(filename);
+    } else {
+        params = init_cg(filename);
+    }
+	print_cg_params(params);
+
+	double *x = calloc(params.N, sizeof(double));
+	double *r = calloc(params.N, sizeof(double));
+	double *p = calloc(params.N, sizeof(double));
+	double *Ap = calloc(params.N, sizeof(double));
 	int iter = 0;
 	double residual = 0.0;
 	double rsold = 0;
 	int conv = 0;
+	
+	clock_t start, end;  
+    double cpu_time_used;
+	start = clock();
 
 	do {
-	 	conv = conjugate_gradient(&A[0][0], Ap, b, x, r, p, &rsold, &tol, &residual, N, 0, iter);
+	 	conv = conjugate_gradient(params.A, Ap, params.b, x, r, p, &rsold, &params.tol, &residual, params.N, 0, iter);
+		printf("Residual in iteration %d: %.17f\n", iter, residual);
 		iter++;
 
-	} while (iter <= max_iter && !conv);
+	} while (iter <= params.max_iter && !conv);
+	
+	end = clock();
 
-	print_result(x, r, p, Ap, residual,iter, N);
+    cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;  
+    printf("Elapsed time   : %f seconds\n", cpu_time_used);
+	printf("Iteration      : %d\n", iter);
+
+	//print_result(x, r, p, Ap, residual,iter, params.N);
 
 	free(x);
     free(r);
