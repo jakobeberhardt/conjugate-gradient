@@ -50,11 +50,17 @@ int main(int argc, char **argv) {
 
 	end_time = wtime();
 
+	double flops_per_iteration = 4 * params.N * params.N + 14 * params.N - 8;
+	double total_flops = flops_per_iteration * iter;
+	double flops_rate = total_flops / (end_time - start_time);
+	double gflops_rate = flops_rate / 1e9;
 	printf("\n");
 	print_result(x, r, p, Ap, residual,iter, params.N);
 	printf("\n");
     printf("Elapsed time   : %f seconds\n", end_time - start_time);
 	printf("Iteration      : %d\n", iter);
+	printf("Total FLOPs    : %e\n", total_flops);
+	printf("GFLOPs Rate    : %.3f GFLOP/s\n", gflops_rate);
 
 	free(x);
     free(r);

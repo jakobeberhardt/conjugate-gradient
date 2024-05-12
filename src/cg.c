@@ -16,13 +16,15 @@ int conjugate_gradient(const double *A, double *Ap, const double *b, double *x, 
 
 	// init p
 	if(iter == 0) {
+		#pragma omp parallel for
 		for(int i=0; i<nrow; i++)
 			p[i] = r[i];
 
 
 		*rsold = 0.0;
-
+		#pragma omp parallel for
 		for(int i=0; i<nrow; i++)
+			#pragma omp atomic
 			*rsold += r[i] * r[i];
 	}
 
@@ -38,6 +40,7 @@ int conjugate_gradient(const double *A, double *Ap, const double *b, double *x, 
 
 	// calculate dot product p Ap
 	p_Ap = 0;
+	#pragma omp parallel for reduction(+:p_Ap)
 	for(int i=0; i<nrow; i++)
 		p_Ap += p[i] * Ap[i];
 
@@ -45,12 +48,14 @@ int conjugate_gradient(const double *A, double *Ap, const double *b, double *x, 
 	alpha = *rsold / p_Ap; 
 
 	// Set x to xk + alpha*p and r to r -alpha*ap
+	#pragma omp parallel for firstprivate(x, r)
 	for(int i=0; i<nrow; i++) {
 		x[i] = x[i] + (alpha * p[i]);
 		r[i] = r[i] - (alpha*Ap[i]);
 	}
 
 	local_residual = 0;
+	#pragma omp parallel for reduction(+:local_residual)
 	for(int i=0; i<nrow; i++)
     	local_residual += r[i] * r[i];
 
@@ -61,14 +66,17 @@ int conjugate_gradient(const double *A, double *Ap, const double *b, double *x, 
 
 	// compute rk+1T * rk+1 as rsnew
 	rsnew = 0.0;
-	for(int i=0; i<nrow; i++)
+	#pragma omp parallel for reduction(+:rsnew)
+	for(int i=0; i<nrow; i++) {
 		rsnew += r[i] * r[i];
+	}
 	
 	// compute beta rsnew / rsold
 	beta = rsnew / *rsold;
 	*rsold = rsnew;
 
 	// update direction p
+	#pragma omp parallel for
 	for(int i=0; i<nrow; i++)
 		p[i] = r[i] + (beta * p[i]);
 
