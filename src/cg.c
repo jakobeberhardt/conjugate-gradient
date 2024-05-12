@@ -1,6 +1,6 @@
 #include <math.h>
 
-int conjugate_gradient(const double *A, double *Ap, const double *b, double *x, double *r, double *p, double *rsold, const double *tol, double *residual, int nrow, int ii, int iter) {
+int conjugate_gradient(const double *A, double *Ap, const double *b, double *x, double *r, double *p, double *rsold, const double *tol, double *residual, int nrow, int ii, int iter, int rank, int size) {
 	
 	double sum, alpha, beta, rsnew, p_Ap, local_residual;
 

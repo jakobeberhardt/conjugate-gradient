@@ -1,4 +1,4 @@
-CC=gcc
+CC=mpicc
 CFLAGS= -O3 -lm -Isrc -fopenmp
 TEST_FLAGS=-lm -lcunit -Isrc $(shell pkg-config --cflags --libs cunit)
 
