@@ -8,6 +8,10 @@
 #define SEED 1234
 #define MAX_PRINT 4
 
+int getRowCount(int nrow, int size) {
+	return nrow / size;
+}
+
 double wtime() {
     struct timespec ts;
     clock_gettime(CLOCK_MONOTONIC, &ts);
