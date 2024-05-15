@@ -73,33 +73,57 @@ CGParams init_cg(const char* filename) {
         fscanf(file, "tol = %lf\n", &params.tol) != 1 ||
         fscanf(file, "max_iter = %d\n", &params.max_iter) != 1) {
         fprintf(stderr, "Failed to read parameters\n");
+        fclose(file);
         exit(EXIT_FAILURE);
     }
 
     params.A = (double*) malloc(params.N * params.N * sizeof(double));
     if (params.A == NULL) {
         fprintf(stderr, "Memory allocation failed for A\n");
+        fclose(file);
         exit(EXIT_FAILURE);
     }
 
     params.b = (double*) malloc(params.N * sizeof(double));
     if (params.b == NULL) {
         fprintf(stderr, "Memory allocation failed for b\n");
+        free(params.A);
+        fclose(file); 
         exit(EXIT_FAILURE);
     }
 
-    fscanf(file, "A =");
+    if (fscanf(file, "A =") != 0) {
+        fprintf(stderr, "Failed to read 'A ='\n");
+        free(params.A);
+        free(params.b);
+        fclose(file);
+        exit(EXIT_FAILURE);
+    }
+
     for (int i = 0; i < params.N * params.N; i++) {
         if (fscanf(file, "%lf", &params.A[i]) != 1) {
             fprintf(stderr, "Failed to read A at index %d\n", i);
+            free(params.A);
+            free(params.b);
+            fclose(file);
             exit(EXIT_FAILURE);
         }
     }
 
-    fscanf(file, " b =");
+    if (fscanf(file, " b =") != 0) {
+        fprintf(stderr, "Failed to read 'b ='\n");
+        free(params.A);
+        free(params.b);
+        fclose(file);
+        exit(EXIT_FAILURE);
+    }
+
     for (int i = 0; i < params.N; i++) {
         if (fscanf(file, "%lf", &params.b[i]) != 1) {
             fprintf(stderr, "Failed to read b at index %d\n", i);
+            free(params.A);
+            free(params.b);
+            fclose(file);
             exit(EXIT_FAILURE);
         }
     }
@@ -107,7 +131,6 @@ CGParams init_cg(const char* filename) {
     fclose(file);
     return params;
 }
-
 void generateRandomSPDMatrix(double *A, int N) {
     int i, j;
     double sum;
