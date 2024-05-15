@@ -9,7 +9,7 @@ typedef struct CGParams {
     int N;        
 } CGParams;
 
-void print_result(double *x, double *r, double *p, double *Ap, double residual, int iter, int N);
+void print_result(double *x, double *r, double *p, double *Ap, double residual, int iter, int N, int conv);
 CGParams init_cg(const char* filename);
 void print_cg_params(const CGParams params);
 CGParams random_init_cg(const char* filename);

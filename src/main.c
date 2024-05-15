@@ -63,7 +63,7 @@ int main(int argc, char **argv) {
 	if(rank != 0) {
 		params.A = (double*) malloc(elements * sizeof(double));
 		params.b = (double*) malloc(local_nrow * sizeof(double));
-		x = calloc(local_nrow, sizeof(double));
+		x = calloc(params.N, sizeof(double));
 		r = calloc(local_nrow, sizeof(double));
 		p = calloc(params.N, sizeof(double));
 		Ap = calloc(local_nrow, sizeof(double));
@@ -75,18 +75,18 @@ int main(int argc, char **argv) {
 	if(rank == 0) start_time = wtime();
 	do {
 	 	conv = conjugate_gradient(params.A, Ap, params.b, x, r, p, &rsold, &params.tol, &residual, params.N, 0, iter, rank, size);
-		if(rank == 0)printf("Residual in iteration %d: %.17f\n", iter, residual);
 		iter++;
-		MPI_Barrier(MPI_COMM_WORLD);
-
+		if(rank == 0)printf("Residual after iteration %d: %.17f\n", iter, residual);
 	} while (iter <= params.max_iter && !conv);
 
-	// TODO: Gather the rest
+	if(rank == 0) end_time = wtime();
+
 	MPI_Gather(x, local_nrow, MPI_DOUBLE, x, local_nrow, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+	MPI_Gather(p, local_nrow, MPI_DOUBLE, p, local_nrow, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+	MPI_Gather(r, local_nrow, MPI_DOUBLE, r, local_nrow, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+	MPI_Gather(Ap, local_nrow, MPI_DOUBLE, Ap, local_nrow, MPI_DOUBLE, 0, MPI_COMM_WORLD);
 
 	if(rank == 0) {
-
-		end_time = wtime();
 
 		flops_per_iteration = 4 * params.N * params.N + 14 * params.N - 8;
 		total_flops = flops_per_iteration * iter;
@@ -94,7 +94,7 @@ int main(int argc, char **argv) {
 		gflops_rate = flops_rate / 1e9;
 		
 		printf("\n");
-		print_result(x, r, p, Ap, residual,iter, params.N);
+		print_result(x, r, p, Ap, residual,iter, params.N, conv);
 		printf("\n");
 		printf("Elapsed time   : %f seconds\n", end_time - start_time);
 		printf("Iteration      : %d\n", iter);

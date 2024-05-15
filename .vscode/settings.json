@@ -1,5 +1,7 @@
 {
 	"files.associations": {
-		"cg_config.h": "c"
+		"cg_config.h": "c",
+		"string.h": "c",
+		"misc.h": "c"
 	}
 }

@@ -18,32 +18,46 @@ double wtime() {
     return (double)ts.tv_sec + ts.tv_nsec / 1E9;
 }
 
-void print_result(double *x, double *r, double *p, double *Ap, double residual, int iter, int N) {
-    printf("Head of solution vector x*:\n");
-    for (int i = 0; i < MAX_PRINT; i++) {
-        printf("%f ", x[i]);
+void print_result(double *x, double *r, double *p, double *Ap, double residual, int iter, int N, int conv) {
+    if(conv) {
+        printf("Found sufficient solution in iteration %d with residual of %.13f\n", iter, residual);
+        printf("\n");
+        printf("Solution vector x*:\n");
+        for (int i = 0; i < MAX_PRINT; i++) {
+            printf("%f ", x[i]);
+        }
+
+    } else {
+        printf("Stopped in iteration %d with residual of %.13f\n", iter, residual);
+        printf("\n");
+        printf("Solution vector x%d:\n", iter);
+        for (int i = 0; i < MAX_PRINT; i++) {
+            printf("%f ", x[i]);
+        }
     }
     printf(" ...");
     printf("\n");
+    printf("\n");
+    printf("Residual vector r:\n");
+    for (int i = 0; i < MAX_PRINT; i++) {
+        printf("%f ", r[i]);
+    }
+    printf(" ...");
+    printf("\n");
+    printf("\n");
 
-    // printf("Residual vector r:\n");
-    // for (int i = 0; i < MAX_PRINT; i++) {
-    //     printf("%f ", r[i]);
-    // }
-    // printf("\n");
-
-    // printf("Search direction vector p:\n");
-    // for (int i = 0; i < MAX_PRINT; i++) {
-    //     printf("%f ", p[i]);
-    // }
-    // printf("\n");
+    printf("Search direction vector p:\n");
+    for (int i = 0; i < MAX_PRINT; i++) {
+        printf("%f ", p[i]);
+    }
+    printf(" ...");
+    printf("\n");
 
     // printf("Vector Ap:\n");
     // for (int i = 0; i < MAX_PRINT; i++) {
     //     printf("%f ", Ap[i]);
     // }
     // printf("\n");
-
 }
 
 CGParams init_cg(const char* filename) {

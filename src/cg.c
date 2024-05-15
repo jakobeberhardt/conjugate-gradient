@@ -1,10 +1,8 @@
 #include <math.h>
 #include "mpi/mpi.h"
-#include <stdio.h>
 #include <misc.h>
 
 int conjugate_gradient(const double *A, double *Ap, const double *b, double *x, double *r, double *p, double *rsold, const double *tol, double *residual, int N, int ii, int iter, int rank, int size) {
-	
 	double sum, alpha, beta, rsnew, local_rsnew, p_Ap, local_residual, local_rsold, local_p_Ap;
 	int local_n = N / size;
 
@@ -29,9 +27,9 @@ int conjugate_gradient(const double *A, double *Ap, const double *b, double *x, 
 		MPI_Allreduce(&local_rsold, rsold, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
 	}
 
-	// Share new p
-	MPI_Allgather(p + rank * local_n, local_n, MPI_DOUBLE, p, local_n, MPI_DOUBLE, MPI_COMM_WORLD);	
-	
+	// share direction p
+    MPI_Allgather(p + rank * local_n, local_n, MPI_DOUBLE, p, local_n, MPI_DOUBLE, MPI_COMM_WORLD);
+
 	// Compute Ap
 	for(int i=0; i<local_n; i++) {
 		sum = 0.0;
