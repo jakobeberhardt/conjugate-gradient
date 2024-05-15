@@ -50,3 +50,24 @@ Where $Ax = b$ is a sparse, symmetric positive definite system such that:
 <p align="cenleftter">
   <img src="figures/cg2dim.png" width="60%">
 </p>
+
+
+## Memory
+
+The memory required by the master process, $M_{\text{master}}(N)$, in bytes, is given by:
+
+$$
+M_{\text{master}}(N) = N^2 \times 8 + 5N \times 8
+$$
+
+Where:
+- $N$: Dimension of the problem size.
+
+The memory required by each worker process, $M_{\text{worker}}(N, \text{size})$, in bytes, is approximately given by:
+
+$$
+M_{\text{worker}}(N, \text{size}) \approx \left(\frac{N^2 + 3N}{\text{size}} + 2N \right) \times 8
+$$
+
+Where:
+- $\text{size}$: Number of parallel processes.

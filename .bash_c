@@ -1,0 +1,19 @@
+cg_memory() {
+    local N=$1
+    local size=$2
+
+    local master_memory=$(echo "$N * $N * 8 + 5 * $N * 8" | bc)
+
+    local worker_memory=$(echo "($N * $N + 3 * $N) / $size + 2 * $N" | bc)
+    worker_memory=$(echo "$worker_memory * 8" | bc)
+
+    local total_memory=$(echo "$master_memory + $worker_memory * ($size - 1)" | bc)
+
+    local master_memory_gb=$(echo "scale=2; $master_memory / 2^30" | bc)
+    local worker_memory_gb=$(echo "scale=2; $worker_memory / 2^30" | bc)
+    local total_memory_gb=$(echo "scale=2; $total_memory / 2^30" | bc)
+
+    echo "Master Memory: $master_memory_gb GiB"
+    echo "Worker Memory: $worker_memory_gb GiB (per worker)"
+    echo "Total System Memory: $total_memory_gb GiB"
+}
