@@ -2,9 +2,8 @@
 #include "cg.h"
 #include "misc.h"
 #include <stdio.h>
-#include <time.h>
 #include <string.h>
-#include "mpi/mpi.h"
+#include <mpi/mpi.h>
 
 int main(int argc, char **argv) {
 	if (argc < 2) {

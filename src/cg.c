@@ -1,5 +1,5 @@
 #include <math.h>
-#include "mpi/mpi.h"
+#include <mpi/mpi.h>
 #include <misc.h>
 
 int conjugate_gradient(const double *A, double *Ap, const double *b, double *x, double *r, double *p, double *rsold, const double *tol, double *residual, int N, int ii, int iter, int rank, int size) {
