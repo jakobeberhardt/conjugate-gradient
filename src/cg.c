@@ -17,10 +17,12 @@ int conjugate_gradient(const double *A, double *Ap, const double *b, double *x, 
 		}
 
 		// init p
+		#pragma omp parallel for
 		for(int i=0; i<local_n; i++)
 			p[i + rank * local_n] = r[i];
 
 		local_rsold = 0.0;
+		#pragma omp parallel for reduction(+:local_rsold)
 		for(int i=0; i<local_n; i++)
 			local_rsold += r[i] * r[i];
 
@@ -31,6 +33,7 @@ int conjugate_gradient(const double *A, double *Ap, const double *b, double *x, 
     MPI_Allgather(p + rank * local_n, local_n, MPI_DOUBLE, p, local_n, MPI_DOUBLE, MPI_COMM_WORLD);
 
 	// Compute Ap
+	#pragma omp parallel for private(sum)
 	for(int i=0; i<local_n; i++) {
 		sum = 0.0;
 		for(int j=0; j<N; j++) {
@@ -42,6 +45,7 @@ int conjugate_gradient(const double *A, double *Ap, const double *b, double *x, 
 	// calculate dot product p Ap
 	p_Ap = 0.0;
 	local_p_Ap = 0.0;
+	#pragma omp parallel for reduction(+:local_p_Ap)
 	for(int i=0; i<local_n; i++) {
 		local_p_Ap += p[i + rank * local_n] * Ap[i];
 	}
@@ -52,6 +56,7 @@ int conjugate_gradient(const double *A, double *Ap, const double *b, double *x, 
 	alpha = *rsold / p_Ap; 
 
 	// Set x to xk + alpha*p and r to r -alpha*ap
+	#pragma omp parallel for
 	for(int i=0; i<local_n; i++) {
 		x[i] = x[i] + (alpha * p[i + rank * local_n]);
 		r[i] = r[i] - (alpha*Ap[i]);
@@ -60,8 +65,9 @@ int conjugate_gradient(const double *A, double *Ap, const double *b, double *x, 
 	// rk+1T * rk+1 as rsnew
 	rsnew = 0.0;
 	local_rsnew = 0.0;
+	#pragma omp parallel for reduction(+:local_rsnew)
 	for(int i=0; i<local_n; i++)
-    	local_rsnew += r[i] * r[i];
+    		local_rsnew += r[i] * r[i];
 
 	MPI_Allreduce(&local_rsnew, &rsnew, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
 
@@ -75,6 +81,7 @@ int conjugate_gradient(const double *A, double *Ap, const double *b, double *x, 
 	*rsold = rsnew;
 
 	// update direction p
+	#pragma omp parallel for
 	for(int i=0; i<local_n; i++)
 		p[i + rank * local_n] = r[i] + (beta * p[i + rank * local_n]);
 		
