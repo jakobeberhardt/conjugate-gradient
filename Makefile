@@ -1,6 +1,6 @@
 CC=mpicc
 CFLAGS= -O3 -lm -Isrc -fopenmp -I/usr/lib/x86_64-linux-gnu/openmpi/include/
-TEST_FLAGS=-lm -lcunit -Isrc $(shell pkg-config --cflags --libs cunit)
+TEST_FLAGS=-lm -lcunit -fopenmp -Isrc $(shell pkg-config --cflags --libs cunit)
 
 all: cg
 
