@@ -39,7 +39,7 @@ int main(int argc, char **argv) {
 		print_cg_params(params);
 
 		x = calloc(params.N, sizeof(double));
-		r = calloc(params.N, sizeof(double));
+		r = (double*)aligned_alloc(32, params.N * sizeof(double));
 		p = calloc(params.N, sizeof(double));
 		Ap = calloc(params.N, sizeof(double));
 	
@@ -63,7 +63,7 @@ int main(int argc, char **argv) {
 		params.A = (double*) malloc(elements * sizeof(double));
 		params.b = (double*) malloc(local_nrow * sizeof(double));
 		x = calloc(params.N, sizeof(double));
-		r = calloc(local_nrow, sizeof(double));
+		r = (double*)aligned_alloc(32, local_nrow * sizeof(double));
 		p = calloc(params.N, sizeof(double));
 		Ap = calloc(local_nrow, sizeof(double));
 	}
