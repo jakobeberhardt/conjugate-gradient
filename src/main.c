@@ -56,7 +56,7 @@ int main(int argc, char **argv) {
 
 	MPI_Barrier(MPI_COMM_WORLD);
 
-	local_nrow = getRowCount(params.N, size);
+	local_nrow = getRowCount(params.N, size, rank);
 	elements = (params.N * params.N ) / size;
 	
 	if(rank != 0) {
@@ -73,7 +73,7 @@ int main(int argc, char **argv) {
 
 	if(rank == 0) start_time = wtime();
 	do {
-	 	conv = conjugate_gradient(params.A, Ap, params.b, x, r, p, &rsold, &params.tol, &residual, params.N, 0, iter, rank, size);
+	 	conv = conjugate_gradient(params.A, Ap, params.b, x, r, p, &rsold, &params.tol, &residual, params.N, local_nrow, iter, rank, size);
 		iter++;
 		if(rank == 0)printf("Residual after iteration %d: %.17f\n", iter, residual);
 	} while (iter <= params.max_iter && !conv);

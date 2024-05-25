@@ -15,6 +15,6 @@ void print_cg_params(const CGParams params);
 CGParams random_init_cg(const char* filename);
 void generateRandomSPDMatrix(double *A, int N);
 double wtime();
-int getRowCount(int nrow, int size);
+int getRowCount(const int totalRows, const int size, const int rank);
 
 #endif /* MISC_H */

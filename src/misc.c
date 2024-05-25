@@ -8,8 +8,8 @@
 #define SEED 1234
 #define MAX_PRINT 4
 
-int getRowCount(int nrow, int size) {
-	return nrow / size;
+int getRowCount(int totalRows, int size, int rank) {
+	return (totalRows / size) + (totalRows % size > rank);
 }
 
 double wtime() {
@@ -131,6 +131,7 @@ CGParams init_cg(const char* filename) {
     fclose(file);
     return params;
 }
+
 void generateRandomSPDMatrix(double *A, int N) {
     int i, j;
     double sum;
@@ -177,8 +178,10 @@ CGParams random_init_cg(const char* filename) {
         fprintf(stderr, "Memory allocation failed for b\n");
         exit(EXIT_FAILURE);
     }
+    
 
     generateRandomSPDMatrix(params.A, params.N);
+    
     for (int i = 0; i < params.N; i++) {
         params.b[i] = (double)(rand() % 100);
     }
