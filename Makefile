@@ -1,6 +1,6 @@
 CC=mpicc
-CFLAGS= -O3 -lm -Isrc -fopenmp -I/usr/lib/x86_64-linux-gnu/openmpi/include/
-TEST_FLAGS=-lm -lcunit -fopenmp -Isrc $(shell pkg-config --cflags --libs cunit)
+CFLAGS= -O3 -lm -mavx2 -Isrc -fopenmp -I/usr/lib/x86_64-linux-gnu/openmpi/include/
+TEST_FLAGS=-lm -lcunit -mavx2 -fopenmp -Isrc $(shell pkg-config --cflags --libs cunit)
 
 all: cg
 
@@ -20,11 +20,13 @@ test/test_cg.o: test/test_cg.c src/cg.h src/misc.h
 	$(CC) -c $< -o $@ $(TEST_FLAGS)
 
 run: cg
-	./cg -r benchmark/1_cg_random.in
+	OMP_NUM_THREADS=1 mpirun -np 1 ./cg -r benchmark/3_cg_random.in
 
 runlong: cg	
 	./cg -r benchmark/cg_large_random.in
 
-# Cleaning up
+valgrind: cg	
+	OMP_NUM_THREADS=1 mpirun -np 1 valgrind --tool=callgrind ./cg -r benchmark/3_cg_random.in && rm callgrind.out.*
+
 clean:
-	rm -f cg test_cg src/*.o test/*.o
+	rm -f cg test_cg src/*.o test/*.o callgrind.out.*
