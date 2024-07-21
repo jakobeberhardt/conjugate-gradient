@@ -31,7 +31,7 @@ void test_conjugate_gradient(void) {
     int local_n = getRowCount(N, 1, 0);
 
     do {
-        conv = conjugate_gradient(&A[0][0], Ap, b, x, r, p, &rsold, &tol, &residual, N, local_n, iter, rank, size);
+        conv = conjugate_gradient(&A[0][0], b, Ap, x, r, p, &rsold, &tol, &residual, N, local_n, iter, rank);
         iter++;
         MPI_Barrier(MPI_COMM_WORLD);
     } while (iter <= max_iter && !conv && rank == 0);
