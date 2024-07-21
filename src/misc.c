@@ -60,7 +60,7 @@ void print_result(double *x, double *r, double *p, double *Ap, double residual, 
     // printf("\n");
 }
 
-CGParams init_cg(const char* filename) {
+CGParams read_cg_config(const char* filename) {
     FILE* file = fopen(filename, "r");
     if (file == NULL) {
         fprintf(stderr, "Error opening file\n");
@@ -73,38 +73,46 @@ CGParams init_cg(const char* filename) {
         fscanf(file, "tol = %lf\n", &params.tol) != 1 ||
         fscanf(file, "max_iter = %d\n", &params.max_iter) != 1) {
         fprintf(stderr, "Failed to read parameters\n");
-        fclose(file);
         exit(EXIT_FAILURE);
     }
 
-    params.A = (double*) malloc(params.N * params.N * sizeof(double));
-    if (params.A == NULL) {
+    fclose(file);
+    return params;
+}
+
+void load_problem(const char* filename, double *A, double *b, CGParams params) {
+    FILE* file = fopen(filename, "r");
+    if (file == NULL) {
+        fprintf(stderr, "Error opening file\n");
+        exit(EXIT_FAILURE);
+    }   
+
+    if (A == NULL) {
         fprintf(stderr, "Memory allocation failed for A\n");
         fclose(file);
         exit(EXIT_FAILURE);
     }
 
-    params.b = (double*) malloc(params.N * sizeof(double));
-    if (params.b == NULL) {
+    if (b == NULL) {
         fprintf(stderr, "Memory allocation failed for b\n");
-        free(params.A);
+        free(A);
         fclose(file); 
         exit(EXIT_FAILURE);
     }
 
     if (fscanf(file, "A =") != 0) {
         fprintf(stderr, "Failed to read 'A ='\n");
-        free(params.A);
-        free(params.b);
+        free(A);
+        free(b);
         fclose(file);
         exit(EXIT_FAILURE);
     }
 
     for (int i = 0; i < params.N * params.N; i++) {
-        if (fscanf(file, "%lf", &params.A[i]) != 1) {
+        if (fscanf(file, "%lf", &A[i]) != 1) {
             fprintf(stderr, "Failed to read A at index %d\n", i);
-            free(params.A);
-            free(params.b);
+            free(A);
+            free(b);
             fclose(file);
             exit(EXIT_FAILURE);
         }
@@ -112,24 +120,23 @@ CGParams init_cg(const char* filename) {
 
     if (fscanf(file, " b =") != 0) {
         fprintf(stderr, "Failed to read 'b ='\n");
-        free(params.A);
-        free(params.b);
+        free(A);
+        free(b);
         fclose(file);
         exit(EXIT_FAILURE);
     }
 
     for (int i = 0; i < params.N; i++) {
-        if (fscanf(file, "%lf", &params.b[i]) != 1) {
+        if (fscanf(file, "%lf", &b[i]) != 1) {
             fprintf(stderr, "Failed to read b at index %d\n", i);
-            free(params.A);
-            free(params.b);
+            free(A);
+            free(b);
             fclose(file);
             exit(EXIT_FAILURE);
         }
     }
 
     fclose(file);
-    return params;
 }
 
 void generateRandomSPDMatrix(double *A, int N) {
@@ -149,44 +156,22 @@ void generateRandomSPDMatrix(double *A, int N) {
     }
 }
 
-CGParams random_init_cg(const char* filename) {
-    FILE* file = fopen(filename, "r");
-    if (file == NULL) {
-        fprintf(stderr, "Error opening file\n");
-        exit(EXIT_FAILURE);
-    }
-
-    CGParams params;
-
-    if (fscanf(file, "N = %d\n", &params.N) != 1 ||
-        fscanf(file, "tol = %lf\n", &params.tol) != 1 ||
-        fscanf(file, "max_iter = %d\n", &params.max_iter) != 1) {
-        fprintf(stderr, "Failed to read parameters\n");
-        exit(EXIT_FAILURE);
-    }
-
-    fclose(file);
+void generate_problem(double *A, double *b, CGParams params) {
     srand(SEED);
-    params.A = (double*) malloc(params.N * params.N * sizeof(double));
-    if (params.A == NULL) {
+    if (A == NULL) {
         fprintf(stderr, "Memory allocation failed for A\n");
         exit(EXIT_FAILURE);
     }
 
-    params.b = (double*) malloc(params.N * sizeof(double));
-    if (params.b == NULL) {
+    if (b == NULL) {
         fprintf(stderr, "Memory allocation failed for b\n");
         exit(EXIT_FAILURE);
     }
-    
-
-    generateRandomSPDMatrix(params.A, params.N);
+    generateRandomSPDMatrix(A, params.N);
     
     for (int i = 0; i < params.N; i++) {
-        params.b[i] = (double)(rand() % 100);
+        b[i] = (double)(rand() % 100);
     }
-
-    return params;
 }
 
 void print_cg_params(const CGParams params) {
@@ -194,18 +179,5 @@ void print_cg_params(const CGParams params) {
     printf("Dimension N: %d\n", params.N);
     printf("Tolerance (tol): %g\n", params.tol);
     printf("Maximum Iterations (max_iter): %d\n", params.max_iter);
-
-    // printf("Matrix A:\n");
-    // for (int i = 0; i < params.N; i++) {
-    //     for (int j = 0; j < params.N; j++) {
-    //         printf("%9.4f ", params.A[i * params.N + j]);
-    //     }
-    //     printf("\n");
-    // }
-
-    // printf("Vector b:\n");
-    // for (int i = 0; i < params.N; i++) {
-    //     printf("%9.4f ", params.b[i]);
-    // }
     printf("\n");
 }

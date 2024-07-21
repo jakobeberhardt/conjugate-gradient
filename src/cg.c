@@ -1,5 +1,5 @@
 #include <math.h>
-#include <mpi/mpi.h>
+#include <mpi.h>
 #include <misc.h>
 
 int conjugate_gradient(const double *A, double *Ap, const double *b, double *x, double *r, double *p, double *rsold, const double *tol, double *residual, int N, int local_nrow, int iter, int rank, int size) {
@@ -29,7 +29,7 @@ int conjugate_gradient(const double *A, double *Ap, const double *b, double *x, 
 	}
 
 	// share direction p
-    MPI_Allgather(p + rank * local_nrow, local_nrow, MPI_DOUBLE, p, local_nrow, MPI_DOUBLE, MPI_COMM_WORLD);
+	MPI_Allgather(MPI_IN_PLACE, 0, MPI_DATATYPE_NULL, p, local_nrow, MPI_DOUBLE, MPI_COMM_WORLD);
 
 	// Compute Ap
 	#pragma omp parallel for private(sum)

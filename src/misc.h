@@ -2,18 +2,16 @@
 #define MISC_H
 
 typedef struct CGParams {
-    double* A;   
-    double* b;    
     double tol;   
     int max_iter; 
     int N;        
 } CGParams;
 
 void print_result(double *x, double *r, double *p, double *Ap, double residual, int iter, int N, int conv);
-CGParams init_cg(const char* filename);
+CGParams read_cg_config(const char* filename);
 void print_cg_params(const CGParams params);
-CGParams random_init_cg(const char* filename);
-void generateRandomSPDMatrix(double *A, int N);
+void load_problem(const char* filename, double *A, double *b, CGParams params);
+void generate_problem(double *A, double *b, CGParams params);
 double wtime();
 int getRowCount(const int totalRows, const int size, const int rank);
 

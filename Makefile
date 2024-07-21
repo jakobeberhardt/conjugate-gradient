@@ -1,6 +1,15 @@
 CC=mpicc
-CFLAGS= -O3 -lm -mavx2 -Isrc -fopenmp -I/usr/lib/x86_64-linux-gnu/openmpi/include/
+CFLAGS= -O3 -mavx2 -lm -Isrc -fopenmp -I/usr/lib/x86_64-linux-gnu/openmpi/include/
+LDFLAGS= 
 TEST_FLAGS=-lm -lcunit -mavx2 -fopenmp -Isrc $(shell pkg-config --cflags --libs cunit)
+
+ifeq ($(COMPILER),intel)
+	CC = mpiicx
+	CFLAGS += -qmkl
+	LDFLAGS += -L/gpfs/apps/MN5/GPP/ONEAPI/2023.2.0/mpi/2021.10.0/lib/release \
+	           -L/gpfs/apps/MN5/GPP/ONEAPI/2023.2.0/mpi/2021.10.0/lib \
+	           -lmpifort -lmpi -ldl -lrt -lpthread
+endif
 
 all: cg
 
